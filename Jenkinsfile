@@ -19,7 +19,7 @@ stage('Preparation') {
 } 
 
 
-stage('Build') {
+stage('mvn{
     node {
         try {
             sh "'${mvnHome}/bin/mvn' -Dclean package"
@@ -30,7 +30,7 @@ stage('Build') {
 } 
 
 
-stage('Static Analysis') {
+stage('sqube') {
     node {
         try {
             withSonarQubeEnv {
@@ -42,7 +42,7 @@ stage('Static Analysis') {
     } 
 } 
 
-stage('Unit Tests') {
+stage('sunfire') {
     node {
         try {
             junit '**/target/surefire-reports/TEST-*.xml'
@@ -56,7 +56,7 @@ stage('Unit Tests') {
 
 if  ("${env.BRANCH_NAME}" == "master") {
 
-    stage('Publish to Artifactory') {
+    stage('npub') {
         node {
             try {
                     echo "Pushed war file to Artifactory: ${version}"
@@ -68,7 +68,7 @@ if  ("${env.BRANCH_NAME}" == "master") {
         } 
     } 
 
-    stage('Deploy to Testing Environment') {
+    stage('testing env') {
         node {
             try {
                 echo "SUNIL BRANCH_NAME : ${env.BRANCH_NAME} "
@@ -82,14 +82,11 @@ if  ("${env.BRANCH_NAME}" == "master") {
         } // end-node
     } // end-stage
 
-    stage('Deploy to Production Environment') {
-        input 'Do you approve deployment to Production?'
+    stage('prod env') {
+        input 'Do you approve ?'
         node {
             try {
                 echo "SUNIL BRANCH_NAME : ${env.BRANCH_NAME} "
-                // tomcat8 server
-                // 192.168.1.100    home
-                // 10.0.0.203       office
                 if  ("${env.BRANCH_NAME}" == "master") {
                     sh "scp target/jpetstore.war root@${prodSrv}:/var/lib/tomcat8/webapps/"
                     currentBuild.result = 'SUCCESS'
